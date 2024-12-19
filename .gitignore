@@ -1,3 +1,9 @@
+# User-Defined
+out/
+build/
+.vs/
+.vscode/
+
 # Prerequisites
 *.d
 
