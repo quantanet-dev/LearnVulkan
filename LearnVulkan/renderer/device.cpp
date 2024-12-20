@@ -43,7 +43,7 @@ namespace lv
 
             i++;
         }
-        
+
         return m_QueueFamilyIndices.isComplete();
     };
 
@@ -102,24 +102,24 @@ namespace lv
             vk::DeviceCreateFlags(),
             1,
             &queueCreateInfo,
-            instanceInfo.validationLayerCount,
-            instanceInfo.validationLayers.data(),
+            0,
+            nullptr,
             0,
             nullptr);
 
-        //         if (enableValidationLayers)
-        //         {
-        //             deviceCreateInfo.enabledLayerCount = validationLayerCount;
-        //             deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
-        //         }
+        if (enableValidationLayers)
+        {
+            deviceCreateInfo.enabledLayerCount = instanceInfo.validationLayerCount;
+            deviceCreateInfo.ppEnabledLayerNames = instanceInfo.validationLayers.data();
+        }
 
-        // #ifdef MacOS
-        //         deviceCreateInfo.enabledExtensionCount = extensionCount;
-        //         deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
-        // #endif
-        /*m_LogicalDevice = m_PhysicalDevice.createDevice(vk::DeviceCreateInfo(vk::DeviceCreateFlags(), queueCreateInfo));*/
+#ifdef MacOS
+        const char *macOSextension = "VK_KHR_portability_subset";
+        deviceCreateInfo.enabledExtensionCount = 1;
+        deviceCreateInfo.ppEnabledExtensionNames = &macOSextension;
+#endif
+
         m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
-        /*m_GraphicsQueue = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphicsFamily.value(), 0);*/
     }
 
     VulkanDevice::~VulkanDevice()
