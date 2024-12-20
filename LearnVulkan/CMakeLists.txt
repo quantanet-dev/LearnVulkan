@@ -7,7 +7,15 @@ add_compile_definitions(
 )
 
 # Add source to this project's executable.
-add_executable (LearnVulkan "main.cpp"  "backend/Window.hpp" "backend/Window.cpp" "backend/Engine.cpp" "renderer/instance.cpp")
+add_executable (
+  LearnVulkan
+  "main.cpp"
+  "backend/Window.hpp" 
+  "backend/Window.cpp" 
+  "backend/Engine.cpp" 
+  "renderer/instance.cpp"
+  "renderer/device.cpp"
+)
 
 find_package(glfw3 CONFIG REQUIRED)
 find_package(Vulkan REQUIRED )

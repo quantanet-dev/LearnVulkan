@@ -95,10 +95,13 @@ namespace lv
 		{
 			throw std::runtime_error("unable to create vulkan instance!");
 		}
+
+		m_Device = new VulkanDevice(m_Instance);
 	}
 
 	lv::VulkanInstance::~VulkanInstance()
 	{
+		delete m_Device;
 		m_Instance.destroy();
 	}
 
