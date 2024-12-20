@@ -2,6 +2,10 @@
 # project specific logic here.
 #
 
+add_compile_definitions(
+  LV_HOST_OS $ENV{LV_HOST_OS}
+)
+
 # Add source to this project's executable.
 add_executable (LearnVulkan "main.cpp"  "backend/Window.hpp" "backend/Window.cpp" "backend/Engine.cpp" "renderer/instance.cpp")
 
