@@ -118,8 +118,8 @@ namespace lv
         deviceCreateInfo.enabledExtensionCount = 1;
         deviceCreateInfo.ppEnabledExtensionNames = &macOSextension;
 #endif
-
         m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
+        m_GraphicsQueue = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphicsFamily.value(), 0);
     }
 
     VulkanDevice::~VulkanDevice()
