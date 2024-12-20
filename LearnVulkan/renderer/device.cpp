@@ -1,29 +1,10 @@
 #include "device.hpp"
-
+#include "instance.hpp"
 #include <iostream>
 #include <map>
 
 namespace lv
 {
-
-    bool FindQueueFamilies(vk::PhysicalDevice device)
-    {
-        QueueFamilyIndices indices;
-        std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
-
-        uint32_t i = 0;
-        for (const auto &queueFamily : queueFamilies)
-        {
-            if (queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
-            {
-                indices.graphicsFamily = i;
-            }
-
-            i++;
-        }
-
-        return indices.isComplete();
-    };
 
     int rateDeviceSuitability(vk::PhysicalDevice device)
     {
@@ -42,7 +23,25 @@ namespace lv
         return score;
     }
 
-    vk::PhysicalDevice PickPhysicalDevice(std::vector<vk::PhysicalDevice> devices)
+    bool VulkanDevice::FindQueueFamilies(vk::PhysicalDevice device)
+    {
+        std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
+
+        uint32_t i = 0;
+        for (const auto &queueFamily : queueFamilies)
+        {
+            if (queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
+            {
+                m_QueueFamilyIndices.graphicsFamily = i;
+            }
+
+            i++;
+        }
+
+        return m_QueueFamilyIndices.isComplete();
+    };
+
+    vk::PhysicalDevice VulkanDevice::PickPhysicalDevice(std::vector<vk::PhysicalDevice> devices)
     {
         std::multimap<int, vk::PhysicalDevice> candidates;
         vk::PhysicalDevice chosenDevice{nullptr};
@@ -73,7 +72,7 @@ namespace lv
         return chosenDevice;
     }
 
-    VulkanDevice::VulkanDevice(const vk::Instance &instance)
+    VulkanDevice::VulkanDevice(const vk::Instance &instance, const InstanceInfo &instanceInfo)
     {
         std::vector<vk::PhysicalDevice> devices = instance.enumeratePhysicalDevices();
         m_PhysicalDevice = PickPhysicalDevice(devices);
@@ -82,9 +81,43 @@ namespace lv
         std::cout << "\tDeviceType: " << vk::to_string(m_PhysicalDevice.getProperties().deviceType) << "\n";
         std::cout << "\tDriverVersion: " << m_PhysicalDevice.getProperties().driverVersion << "\n";
         std::cout << "\tAPIVersion: " << m_PhysicalDevice.getProperties().apiVersion << "\n";
+
+        float queuePriority = 1.0f;
+
+        vk::DeviceQueueCreateInfo queueCreateInfo = vk::DeviceQueueCreateInfo(
+            vk::DeviceQueueCreateFlags(),
+            m_QueueFamilyIndices.graphicsFamily.value(),
+            1,
+            &queuePriority);
+
+        vk::PhysicalDeviceFeatures deviceFeatures{};
+
+        vk::DeviceCreateInfo deviceCreateInfo = vk::DeviceCreateInfo(
+            vk::DeviceCreateFlags(),
+            1,
+            &queueCreateInfo,
+            instanceInfo.validationLayerCount,
+            instanceInfo.validationLayers.data(),
+            instanceInfo.extensionCount,
+            instanceInfo.extensions.data());
+
+        //         if (enableValidationLayers)
+        //         {
+        //             deviceCreateInfo.enabledLayerCount = validationLayerCount;
+        //             deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+        //         }
+
+        // #ifdef MacOS
+        //         deviceCreateInfo.enabledExtensionCount = extensionCount;
+        //         deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
+        // #endif
+
+        m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
+        m_GraphicsQueue = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphicsFamily.value(), 0);
     }
 
     VulkanDevice::~VulkanDevice()
     {
+        m_LogicalDevice.destroy();
     }
 }

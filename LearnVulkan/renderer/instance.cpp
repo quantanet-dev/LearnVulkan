@@ -15,36 +15,31 @@
 #endif
 #endif
 
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif // !NDEBUG
-
 // TODO: Add VkDebugUtilsMessengerEXT
 
 namespace lv
 {
-
-	static const std::vector<const char *> validationLayers = {
-		"VK_LAYER_KHRONOS_validation"};
-	static const uint32_t validationLayerCount = (uint32_t)validationLayers.size();
+	static InstanceInfo p_InstanceInfo;
 
 	lv::VulkanInstance::VulkanInstance(std::string applicationName, std::string engineName)
 	{
+		p_InstanceInfo.validationLayers = {"VK_LAYER_KHRONOS_validation"};
+		p_InstanceInfo.validationLayerCount = p_InstanceInfo.validationLayers.size();
+
 		m_Version = vk::enumerateInstanceVersion();
 
 		std::vector<vk::ExtensionProperties> availableExtensions = CheckExtensionSupport();
-		std::vector<const char *> extensions;
+
 #ifdef MacOS
-		extensions.emplace_back(vk::KHRPortabilityEnumerationExtensionName);
+		p_InstanceInfo.extensions.emplace_back(vk::KHRPortabilityEnumerationExtensionName);
 #endif
-		uint32_t extensionCount = (uint32_t)extensions.size();
 
 		for (const auto &extension : availableExtensions)
 		{
-			extensions.emplace_back(extension.extensionName);
+			p_InstanceInfo.extensions.emplace_back(extension.extensionName);
 		}
+
+		p_InstanceInfo.extensionCount = p_InstanceInfo.extensions.size();
 
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
@@ -70,10 +65,10 @@ namespace lv
 			createInfo = vk::InstanceCreateInfo(
 				vk::InstanceCreateFlags(),
 				&appInfo,
-				validationLayerCount,
-				validationLayers.data(),
-				extensionCount,
-				extensions.data());
+				p_InstanceInfo.validationLayerCount,
+				p_InstanceInfo.validationLayers.data(),
+				p_InstanceInfo.extensionCount,
+				p_InstanceInfo.extensions.data());
 		}
 		else
 		{
@@ -82,8 +77,8 @@ namespace lv
 				&appInfo,
 				0,
 				nullptr,
-				extensionCount,
-				extensions.data());
+				p_InstanceInfo.extensionCount,
+				p_InstanceInfo.extensions.data());
 		}
 
 #ifdef MacOS
@@ -96,7 +91,7 @@ namespace lv
 			throw std::runtime_error("unable to create vulkan instance!");
 		}
 
-		m_Device = new VulkanDevice(m_Instance);
+		m_Device = new VulkanDevice(m_Instance, p_InstanceInfo);
 	}
 
 	lv::VulkanInstance::~VulkanInstance()
@@ -159,7 +154,7 @@ namespace lv
 		}
 
 		bool layerFound = false;
-		for (const char *layerName : validationLayers)
+		for (const char *layerName : p_InstanceInfo.validationLayers)
 		{
 			for (const auto &layerProperties : layers)
 			{

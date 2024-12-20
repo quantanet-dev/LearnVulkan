@@ -1,11 +1,31 @@
 #pragma once
 
+#ifdef LV_HOST_OS
+#if LV_HOST_OS == Darwin
+#define MacOS
+#endif
+#endif
+
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif // !NDEBUG
+
 // deps
 #include "vulkan/vulkan.hpp"
 #include "device.hpp"
 
 namespace lv
 {
+
+	struct InstanceInfo
+	{
+		std::vector<const char *> validationLayers;
+		uint32_t validationLayerCount;
+		std::vector<const char *> extensions;
+		uint32_t extensionCount;
+	};
 
 	class VulkanInstance
 	{
@@ -22,5 +42,4 @@ namespace lv
 		std::vector<vk::ExtensionProperties> CheckExtensionSupport();
 		bool CheckValidationLayerSupport();
 	};
-
 }
