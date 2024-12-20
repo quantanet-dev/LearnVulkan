@@ -1,3 +1,4 @@
+// Internal
 #include "Engine.hpp"
 
 namespace lv {
@@ -5,6 +6,18 @@ namespace lv {
 	Engine::~Engine()
 	{
 		delete m_Window;
+		delete m_VulkanInstance;
+	}
+
+	void Engine::Initialize(int width, int height, std::string windowTitle)
+	{
+		CreateWindow(width, height, windowTitle);
+		CreateVulkanInstance();
+	}
+
+	void Engine::CreateVulkanInstance()
+	{
+		m_VulkanInstance = new VulkanInstance(m_applicationName, m_EngineName);
 	}
 
 	void Engine::CreateWindow(int width, int height, std::string windowTitle)

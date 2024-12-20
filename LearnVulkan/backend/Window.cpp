@@ -2,7 +2,6 @@
 #include "Engine.hpp"
 #include "Window.hpp"
 
-
 namespace lv {
 
 	Window::Window(int width, int height, std::string windowTitle) :

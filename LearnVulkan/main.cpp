@@ -6,7 +6,8 @@
 int main()
 {
 	lv::Engine& engine = lv::Engine::GetInstance();
-	engine.CreateWindow(1280, 720, "LearnVulkan");
+	engine.Initialize(1280, 720, "LearnVulkan");
 	engine.Run();
 
+	return EXIT_SUCCESS;
 }
