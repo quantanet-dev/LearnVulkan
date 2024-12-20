@@ -34,10 +34,16 @@ namespace lv
             {
                 m_QueueFamilyIndices.graphicsFamily = i;
             }
+            if (queueFamily.queueFlags & vk::QueueFlagBits::eProtected)
+            {
+                m_QueueFamilyIndices.graphicsFamily = i;
+            }
+
+            std::cout << vk::to_string(queueFamily.queueFlags) << std::endl;
 
             i++;
         }
-
+        
         return m_QueueFamilyIndices.isComplete();
     };
 
@@ -98,8 +104,8 @@ namespace lv
             &queueCreateInfo,
             instanceInfo.validationLayerCount,
             instanceInfo.validationLayers.data(),
-            instanceInfo.extensionCount,
-            instanceInfo.extensions.data());
+            0,
+            nullptr);
 
         //         if (enableValidationLayers)
         //         {
@@ -111,9 +117,9 @@ namespace lv
         //         deviceCreateInfo.enabledExtensionCount = extensionCount;
         //         deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
         // #endif
-
+        /*m_LogicalDevice = m_PhysicalDevice.createDevice(vk::DeviceCreateInfo(vk::DeviceCreateFlags(), queueCreateInfo));*/
         m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
-        m_GraphicsQueue = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphicsFamily.value(), 0);
+        /*m_GraphicsQueue = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphicsFamily.value(), 0);*/
     }
 
     VulkanDevice::~VulkanDevice()

@@ -30,8 +30,8 @@ namespace lv
         bool FindQueueFamilies(vk::PhysicalDevice device);
 
     private:
-        vk::PhysicalDevice m_PhysicalDevice{nullptr};
-        vk::Device m_LogicalDevice{nullptr};
+        vk::PhysicalDevice m_PhysicalDevice;
+        vk::Device m_LogicalDevice;
         QueueFamilyIndices m_QueueFamilyIndices;
         vk::Queue m_GraphicsQueue;
     };
